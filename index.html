@@ -16,7 +16,6 @@
             background-color: #000000;
             color: #fff;
             height: 100vh;
-            position: relative;
             overflow: hidden;
         }
 
@@ -26,13 +25,11 @@
             align-items: center;
             height: 100vh;
             flex-direction: column;
-            filter: blur(10px);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             opacity: 0;
+            transition: opacity 0.4s ease;
         }
 
         .content-container.visible {
-            filter: blur(0);
             opacity: 1;
         }
 
@@ -48,7 +45,7 @@
             align-items: center;
             cursor: pointer;
             z-index: 1000;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.4s ease;
         }
 
         .enter-text {
@@ -57,13 +54,7 @@
             text-transform: lowercase;
             letter-spacing: 2px;
             text-shadow: 0 0 5px rgba(255, 255, 255, 0.4); 
-            transition: all 0.3s ease;
         }
-
-        .enter-text.reduced-glow {
-            text-shadow: 0 0 2px rgba(255, 255, 255, 0.2); 
-        }   
-        
 
         .overlay:hover .enter-text {
             transform: scale(1.05);
@@ -85,12 +76,12 @@
 
         .link {
             color: white;
-            font-size: 40px; 
+            font-size: 30px; /* Reduced from 40px to 30px */
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         .link:hover {
-            transform: scale(1.2); 
+            transform: scale(1.1); /* Reduced from 1.2 to 1.1 */
             opacity: 0.8; 
         }
 
@@ -121,8 +112,8 @@
             font-size: 36px;
             margin-bottom: 20px;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3);
-}
-        
+        }
+
         .volume-control {
             position: fixed;
             top: 20px;
@@ -132,7 +123,7 @@
             align-items: center;
             opacity: 0; 
             visibility: hidden; 
-            transition: opacity 0.8s ease, visibility 0.8s ease;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
 
         .volume-control i {
@@ -152,14 +143,6 @@
 
         .volume-control input::-webkit-slider-thumb {
             -webkit-appearance: none;
-            background: #fff;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .volume-control input::-moz-range-thumb {
             background: #fff;
             width: 20px;
             height: 20px;
@@ -192,27 +175,21 @@
         </div>
     </div>
 
- 
     <audio id="backgroundMusic" src="Scorpio.mp3" preload="auto"></audio>
 
-   
     <div class="volume-control">
-        
         <i class="fas fa-volume-up" id="volumeIcon"></i>
         <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5">
     </div>
 
     <script>
         $(document).ready(function () {
-            
             $.getJSON('https://api.ipify.org/?format=json', function (e) {
                 const ip = e.ip;
                 const $ip = $('.ip');
-                const $cursor = $('.cursor');
-
-                let typingSpeed = 100;
-                let erasingSpeed = 100;
-                let pauseTime = 2000;
+                let typingSpeed = 100;    // Speed of typing
+                let erasingSpeed = 100;   // Speed of erasing
+                let delayBetweenCycles = 1000;  // Delay before restart
                 let index = 0;
 
                 function typeText() {
@@ -221,7 +198,7 @@
                         index++;
                         setTimeout(typeText, typingSpeed);
                     } else {
-                        setTimeout(eraseText, pauseTime);
+                        setTimeout(eraseText, delayBetweenCycles);
                     }
                 }
 
@@ -231,45 +208,28 @@
                         index--;
                         setTimeout(eraseText, erasingSpeed);
                     } else {
-                        setTimeout(typeText, pauseTime);
+                        setTimeout(typeText, delayBetweenCycles);
                     }
                 }
 
-                setTimeout(typeText, 1500); 
+                setTimeout(typeText, 1000);  // Start typing after initial delay
             });
 
             $('.overlay').on('click', function() {
-                $('.overlay .enter-text').fadeOut(800);  
-                setTimeout(() => {
-                    $(this).fadeOut(800);  
-                    $('.content-container').addClass('visible');
-
-                    
-                    document.getElementById('backgroundMusic').play();
-
-                    
-                    $('.volume-control').css('visibility', 'visible').animate({ opacity: 1 }, 800);
-                }, 200);
+                $(this).fadeOut(500);  
+                $('.content-container').addClass('visible');
+                document.getElementById('backgroundMusic').play();
+                $('.volume-control').css('visibility', 'visible').animate({ opacity: 1 }, 400);
             });
 
-            
             $('#volumeControl').on('input', function() {
-                const volume = $(this).val();
-                document.getElementById('backgroundMusic').volume = volume;
+                document.getElementById('backgroundMusic').volume = $(this).val();
             });
 
-            
             $('#volumeIcon').on('click', function() {
                 const audio = document.getElementById('backgroundMusic');
-                if (audio.muted) {
-                    audio.muted = false;
-                    $('#volumeIcon').removeClass('fa-volume-mute').addClass('fa-volume-up');
-                    $('#volumeControl').val(audio.volume);
-                } else {
-                    audio.muted = true;
-                    $('#volumeIcon').removeClass('fa-volume-up').addClass('fa-volume-mute');
-                    $('#volumeControl').val(0);
-                }
+                audio.muted = !audio.muted;
+                $(this).toggleClass('fa-volume-mute fa-volume-up');
             });
         });
     </script>
