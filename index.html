@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>losteverything</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script> <!-- Load the YouTube API -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000000; /* Full black background */
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        h1, .link, .ip-info {
+            color: #fff;
+            text-transform: lowercase; 
+        }
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .link {
+            color: white;
+            padding: 15px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 18px;
+            text-align: center;
+            width: 200px;
+            border: 1px solid #fff;
+            background-color: rgba(0, 0, 0, 0.6); /* Transparent background */
+            transition: transform 0.3s ease-out;
+        }
+
+        /* Hover effect */
+        .link:hover {
+            transform: translateY(-10px) scale(1.1);
+            opacity: 0.8;
+        }
+
+        .ip-info {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 20px;
+            background-color: #fff;
+            margin-left: 5px;
+            animation: blink 0.5s step-start infinite;
+        }
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+        h1 {
+            font-size: 30px; 
+        }
+
+        /* Hides the iframe (video player) from the user */
+        #player {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- YouTube player -->
+    <div id="player"></div>
+
+    <h1>losteverything</h1> <!-- Static title without blinking or typing effect -->
+    <div class="links">
+        <a class="link tiktok" href="https://www.tiktok.com/@yahya.v4" target="_blank" rel="noopener noreferrer">tiktok</a>
+        <a class="link" href="https://www.instagram.com/yahya.yazjeen" target="_blank" rel="noopener noreferrer">instagram</a>
+        <a class="link discord" href="https://discord.gg/trumps" target="_blank" rel="noopener noreferrer">trumpware</a>
+    </div>
+
+    <div class="ip-info">
+        <p><span class="ip"></span><span class="cursor"></span></p>
+    </div>
+
+    <script>
+        // This function loads the YouTube API
+        function onYouTubeIframeAPIReady() {
+            var player = new YT.Player('player', {
+                height: '0', // Set height to 0 so it's invisible
+                width: '0',  // Set width to 0 so it's invisible
+                videoId: 'GXCnxtyzZx4', // YouTube video ID
+                playerVars: {
+                    autoplay: 1, // Autoplay when the page loads
+                    loop: 1, // Loop the video
+                    playlist: 'GXCnxtyzZx4', // Use the same video ID for the loop to work
+                    mute: 1, // Mute the video for audio-only
+                    controls: 0, // Hide video controls
+                    rel: 0, // Prevent related videos after the video ends
+                    showinfo: 0, // Hide video info (title, etc.)
+                    modestbranding: 1, // Hide YouTube logo
+                    fs: 0 // Disable fullscreen option
+                },
+                events: {
+                    onReady: function(event) {
+                        event.target.playVideo(); // Play video when the player is ready
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $.getJSON('https://api.ipify.org/?format=json', function (e) {
+                const ip = e.ip;
+                const $ip = $('.ip');
+                const $cursor = $('.cursor');
+
+                let typingSpeed = 75; 
+                let erasingSpeed = 75; 
+                let cycleTime = 3000; 
+                let totalCharacters = ip.length;
+
+                typingSpeed = cycleTime / (totalCharacters * 2); 
+                erasingSpeed = typingSpeed;
+
+                let index = 0;
+
+                function typeText() {
+                    if (index < ip.length) {
+                        $ip.text($ip.text() + ip[index]);
+                        index++;
+                        setTimeout(typeText, typingSpeed);
+                    } else {
+                        setTimeout(eraseText, 1000);
+                    }
+                }
+
+                function eraseText() {
+                    if (index > 0) {
+                        $ip.text($ip.text().slice(0, -1));
+                        index--;
+                        setTimeout(eraseText, erasingSpeed);
+                    } else {
+                        setTimeout(typeText, 1000);
+                    }
+                }
+
+                setTimeout(typeText, 500);
+            });
+        });
+    </script>
+</body>
+</html>
